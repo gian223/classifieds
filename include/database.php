@@ -14,8 +14,7 @@ class Database{
     }
 
     public function query($sql){
-        $escaped = $this->escape_string($sql);
-        $result = $this->connection->query($escaped);
+        $result = $this->connection->query($sql);
         return $result;
     }
 

@@ -3,6 +3,7 @@
 class User{
 
     public $id;
+    public $role;
     public $username;
     public $first_name;
     public $last_name;
@@ -20,6 +21,11 @@ class User{
         return self::find_this_query("SELECT * FROM user");
     }
 
+    public static function find_user_by_id($id){
+        $the_result_array = self::find_this_query("SELECT * FROM user WHERE id='".$id."' LIMIT 1");
+        return !empty($the_result_array) ? array_shift($the_result_array) : false;
+    }
+
     public static function find_this_query($sql){
         global $database;
         $result_set = $database->query($sql);
@@ -29,6 +35,16 @@ class User{
             $the_object_array[] = self::instantiation($row);
         }
         return $the_object_array;
+    }
+    public static function verify_user($username, $password){
+        global $database;
+        $username = $database->escape_string($username);
+        $password = $database->escape_string($password);
+
+        $sql = "SELECT * FROM user WHERE username='".$username."' AND password='".$password."' LIMIT 1";
+
+        $the_result_array = self::find_this_query($sql);
+        return !empty($the_result_array) ? array_shift($the_result_array) : false;
     }
 
     public static function instantiation($the_record){
