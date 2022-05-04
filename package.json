@@ -1,0 +1,22 @@
+{
+  "name": "classifieds",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile:sass": "sass sass/main.scss css/style.css -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gian223/classifieds.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gian223/classifieds/issues"
+  },
+  "homepage": "https://github.com/gian223/classifieds#readme",
+  "devDependencies": {
+    "sass": "^1.51.0"
+  }
+}
