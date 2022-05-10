@@ -1,14 +1,23 @@
+<?php
+require_once('../include/init.php');
+if (!$session->is_signed_in()) {
+    redirect("login.php");
+} else {
+    $user = User::find_user_by_id($_SESSION['user_id']);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <title>Home | Classifieds</title>
-    <?php include('../../template/head.php'); ?>
+    <?php include('../template/head.php'); ?>
 </head>
 
 <body>
     <div id="app">
-        <?php include('../../template/header.php'); ?>
+        <?php include('../template/header.php'); ?>
         <div class="container-fluid header">
             <div class="container text-white">
                 <div class="row align-items-end">
@@ -31,7 +40,8 @@
         <div class="container-fluid pt-3 pb-5">
             <div class="container">
                 <div class="row">
-                    <?php include('../menu.php'); ?>
+
+                    <?php include('menu.php'); ?>
                     <main class="col-lg-9">
                         <article class="card">
                             <div class="card-body">
@@ -145,11 +155,167 @@
                         </article>
                     </main>
                 </div>
+
             </div>
         </div>
 
-        <?php include('../../template/footer.php'); ?>
+        <?php include('../template/footer.php'); ?>
     </div>
+
+    <script>
+        const region = document.querySelector('#region');
+        const town = document.querySelector('#town');
+        const form = document.querySelector('#update');
+
+        let validateAddress = document.querySelector('input[name="address"]');
+        let validateRegion = region;
+        let validateTown = town;
+        let validateZipCode = document.querySelector('input[name="zip_code"]');
+        let validatePhone = document.querySelector('input[name="phone"]');
+        let addressMessage = document.querySelector('#address_message');
+        let regionMessage = document.querySelector('#region_message');
+        let townMessage = document.querySelector('#town_message');
+        let zipCodeMessage = document.querySelector('#zip_message');
+        let phoneMessage = document.querySelector('#phone_message');
+        let formInput = document.querySelectorAll(".form-control");
+        let updateSuccess = document.querySelector('.update_success');
+        
+        let isFormValid = false;
+
+        // Check if form was updated and display message
+        checkUpdated();
+        
+
+        // Run function to populate related towns on page load
+        getTowns(region.value);
+
+        // Validate form after towns have populated (timeout to allow ajax to rending the list first)
+        setTimeout(validForm, 500);
+
+        // Event Listeners
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isFormValid) {
+                form.submit();
+            }
+        });
+
+        region.addEventListener('change', function() {
+            getTowns(this.value);
+        });
+
+        for (let i = 0; i < formInput.length; i++) {
+            formInput[i].addEventListener('change', function() {
+                validForm();
+            });
+        }
+
+        // Check if form has been updated
+        function checkUpdated(){
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if(urlParams.has('updated')){
+                updateSuccess.classList.remove("d-none");
+            }
+        }
+
+        // Ajax request related towns and populate in select list
+        function getTowns(id) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                if (xhttp.status === 200) {
+                    const dropdown = document.querySelector('#town');
+                    const town = JSON.parse(xhttp.responseText);
+                    let options = "<option value='0'>Please select a town...</option>";
+                    for (var i = 0; i < town.length; i++) {
+                        options += "<option value='" + town[i].id + "'>" + town[i].name + "</option>";
+                    }
+                    dropdown.innerHTML = options;
+                    dropdown.value = <?php echo $user->town; ?>
+
+                    if (!dropdown.value) {
+                        dropdown.value = 0;
+                    } else {
+                        dropdown.value = <?php echo $user->town; ?>
+                    }
+                }
+            }
+            xhttp.open("POST", "../include/ajax.php", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send('region_id=' + id);
+        }
+
+        // Validate Form
+        function validForm() {
+
+            const checkAddress = () => {
+                valid = false;
+                if (validateAddress.value == '') {
+                    addressMessage.innerHTML = 'Address must not be empty';
+                } else {
+                    addressMessage.innerHTML = '';
+                    valid = true;
+                }
+                return valid;
+            }
+
+            const checkRegion = () => {
+                valid = false;
+                if (validateRegion.value == 0) {
+                    regionMessage.innerHTML = 'You must select a Region';
+                } else {
+                    regionMessage.innerHTML = '';
+                    valid = true;
+                }
+                return valid;
+            }
+
+            const checkTown = () => {
+                valid = false;
+                if (validateTown.value == 0) {
+                    townMessage.innerHTML = 'You must select a Town';
+                } else {
+                    townMessage.innerHTML = '';
+                    valid = true;
+                }
+                return valid;
+            }
+
+            const checkZipCode = () => {
+                valid = false;
+                if (validateZipCode.value == '') {
+                    zipCodeMessage.innerHTML = 'Zip Code must not be empty';
+                } else if (isNaN(validateZipCode.value) || (validateZipCode.value.length < 3 || validateZipCode.value.length > 4)) {
+                    zipCodeMessage.innerHTML = 'Zip Code must be a number between 3 and 4 digits long';
+                } else {
+                    zipCodeMessage.innerHTML = '';
+                    valid = true;
+                }
+                return valid;
+            }
+
+            const checkPhone = () => {
+                valid = false;
+                if (validatePhone.value == '') {
+                    phoneMessage.innerHTML = 'Phone must not be empty';
+                } else if (isNaN(validatePhone.value) || (validatePhone.value.length < 7 || validatePhone.value.length > 12)) {
+                    phoneMessage.innerHTML = 'Phone must ne a number between 7 and 12 digits long';
+                } else {
+                    phoneMessage.innerHTML = '';
+                    valid = true;
+                }
+                return valid;
+            }
+            let isAddressValid = checkAddress();
+            let isRegionValid = checkRegion();
+            let isTownValid = checkTown();
+            let isZipCodeValid = checkZipCode();
+            let isPhoneValid = checkPhone();
+
+            isFormValid = isAddressValid && isRegionValid && isTownValid && isZipCodeValid && isPhoneValid;
+
+        }
+    </script>
 </body>
 
 </html>

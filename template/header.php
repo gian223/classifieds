@@ -45,7 +45,7 @@ if ($session->is_signed_in()) {
                         </li>
                     <?php } else { ?>
                         <li class="nav-item">
-                            <a href="account.php" class="nav-link">
+                            <a href="account/account.php" class="nav-link">
                                 <i class="fa-solid fa-user"></i>
                                 My Account
                             </a>

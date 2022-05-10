@@ -12,7 +12,7 @@
             <a class="nav-link" href="#">Offers</a>
 
             <h5 class="nav-link text-dark">Selling</h5>
-            <a class="nav-link" href="account/listing/start.php">Start a listing</a>
+            <a class="nav-link" href="listing/start.php">Start a listing</a>
             <a class="nav-link" href="#">items Im Selling</a>
             <a class="nav-link" href="#">Sold</a>
             <a class="nav-link" href="#">Unsold</a>

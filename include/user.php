@@ -12,7 +12,8 @@ class User{
     public $phone;
     public $account_type;
     public $address;
-    public $city;
+    public $region;
+    public $town;
     public $zip_code;
     public $business_name;
     public $business_logo;
@@ -24,6 +25,11 @@ class User{
     public static function find_user_by_id($id){
         $the_result_array = self::find_this_query("SELECT * FROM user WHERE id='".$id."' LIMIT 1");
         return !empty($the_result_array) ? array_shift($the_result_array) : false;
+    }
+
+    public static function update_user($address, $region, $town, $zip_code, $phone){
+        global $database;
+        $database->query("UPDATE user SET address='$address', region='$region', town='$town', zip_code='$zip_code', phone='$phone' WHERE id=1 ");
     }
 
     public static function find_this_query($sql){
@@ -61,6 +67,7 @@ class User{
         $object_properties = get_object_vars($this);
         return array_key_exists($the_attribute, $object_properties);
     }
+
 }
 
 
